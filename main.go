@@ -6,28 +6,23 @@ import (
 )
 
 const (
-	LENGTH = 50
-	WIDTH  = 50
+	LENGTH = 15
+	WIDTH  = 15
 	raio   = 5
 )
 
 func main() {
 	var screen [LENGTH][WIDTH]rune
 	p1 := [2]int{1, 1}
-	p2 := [2]int{10, 1}
+	p2 := [2]int{14, 1}
 	p3 := [2]int{1, 10}
-	p4 := [2]int{10, 10}
-	center := [2]int{(LENGTH / 2) - 1, (WIDTH / 2) - 1}
+	p4 := [2]int{14, 10}
 
-	screen[center[0]][center[1]] = '#'
+	connectPoints(&screen, p1, p2)
+	connectPoints(&screen, p1, p3)
+	connectPoints(&screen, p4, p3)
+	connectPoints(&screen, p4, p2)
 
-	connectPoints(&screen, &p1, &p2)
-
-	connectPoints(&screen, &p1, &p3)
-
-	connectPoints(&screen, &p4, &p3)
-
-	connectPoints(&screen, &p4, &p2)
 	printScreen(screen)
 }
 
@@ -38,7 +33,7 @@ func verifyPoint(point *[2]int) bool {
 	return false
 }
 
-func connectPoints(screen *[LENGTH][WIDTH]rune, p1 *[2]int, p2 *[2]int) { // Bresenham's Line Drawing Algorithm
+func connectPoints(screen *[LENGTH][WIDTH]rune, p1 [2]int, p2 [2]int) { // Bresenham's Line Drawing Algorithm
 	dx := int(math.Abs(float64(p1[0] - p2[0])))
 	dy := int(math.Abs(float64(p1[1] - p2[1])))
 	sx := 1
@@ -52,7 +47,7 @@ func connectPoints(screen *[LENGTH][WIDTH]rune, p1 *[2]int, p2 *[2]int) { // Bre
 	err := dx - dy
 
 	for {
-		if verifyPoint(p1) {
+		if verifyPoint(&p1) {
 			screen[p1[0]][p1[1]] = '*'
 		}
 		if p1[0] == p2[0] && p1[1] == p2[1] {
