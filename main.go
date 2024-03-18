@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 )
 
 const (
@@ -12,44 +13,68 @@ const (
 
 func main() {
 	var screen [LENGTH][WIDTH]rune
-	p1 := [2]float64{6, 3}
-	p2 := [2]float64{7, 6}
-	center := [2]float64{(LENGTH / 2) - 1, (WIDTH / 2) - 1}
-	if verifyPoint(&p1) {
-		screen[int(p1[0])][int(p1[1])] = '*'
-	}
-	screen[int(center[0])][int(center[1])] = '#'
+	p1 := [2]int{1, 1}
+	p2 := [2]int{10, 1}
+	p3 := [2]int{1, 10}
+	p4 := [2]int{10, 10}
+	center := [2]int{(LENGTH / 2) - 1, (WIDTH / 2) - 1}
+
+	screen[center[0]][center[1]] = '#'
 
 	connectPoints(&screen, &p1, &p2)
+
+	connectPoints(&screen, &p1, &p3)
+
+	connectPoints(&screen, &p4, &p3)
+
+	connectPoints(&screen, &p4, &p2)
 	printScreen(screen)
 }
 
-func verifyPoint(point *[2]float64) bool {
-	if point[0] < LENGTH && point[1] < WIDTH {
+func verifyPoint(point *[2]int) bool {
+	if point[0] < LENGTH && point[1] < WIDTH && point[0] >= 0 && point[1] >= 0 {
 		return true
 	}
 	return false
 }
 
-func connectPoints(screen *[LENGTH][WIDTH]rune, p1 *[2]float64, p2 *[2]float64) {
-	m := (p2[1] - p1[1]) / (p2[0] - p1[0])
-	n := p1[1] - (m * p1[0])
+func connectPoints(screen *[LENGTH][WIDTH]rune, p1 *[2]int, p2 *[2]int) { // Bresenham's Line Drawing Algorithm
+	dx := int(math.Abs(float64(p1[0] - p2[0])))
+	dy := int(math.Abs(float64(p1[1] - p2[1])))
+	sx := 1
+	if p2[0] < p1[0] {
+		sx = -1
+	}
+	sy := 1
+	if p2[1] < p1[1] {
+		sy = -1
+	}
+	err := dx - dy
 
-	for i := 0.0; i < LENGTH; i++ {
-		for j := 0.0; j < WIDTH; j++ {
-			if i == m*j+n {
-				screen[int(j)][int(i)] = '*'
-			}
+	for {
+		if verifyPoint(p1) {
+			screen[p1[0]][p1[1]] = '*'
 		}
-
+		if p1[0] == p2[0] && p1[1] == p2[1] {
+			break
+		}
+		e2 := 2 * err
+		if e2 > -dy {
+			err -= dy
+			p1[0] += sx
+		}
+		if e2 < dx {
+			err += dx
+			p1[1] += sy
+		}
 	}
 }
 
 func printScreen(screen [LENGTH][WIDTH]rune) {
 	for i := 0; i < LENGTH; i++ {
 		for j := 0; j < WIDTH; j++ {
-			if screen[j][i] != 0 {
-				fmt.Printf("%c ", screen[j][i])
+			if screen[i][j] != 0 {
+				fmt.Printf("%c ", screen[i][j])
 			} else {
 				fmt.Print("  ")
 			}
